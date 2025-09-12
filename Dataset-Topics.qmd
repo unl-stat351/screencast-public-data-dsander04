@@ -1,21 +1,21 @@
 ---
-author: Your Name
+author: Dominic Sander
 title: Project Dataset and Topics
 output: html
 ---
 
-[Link to dataset]()
+[https://www.pro-football-reference.com/years/2024/#all_team_stats]()
 
 Things you plan to investigate using this dataset:
 
-- Thing 1
-- Thing 2
-- Thing 3
+- I'd like to look at number of penalties vs. yards of those penalties. We would expect this to have a positive linear correlation, but if a team falls as an outlier we could do an analysis on that (they committed less harmful or more harmful penalties).
+- I also want to look at turnovers committed. It could either be looking at the difference between interceptions and fumbles between all teams or fumbles per rush vs. interceptions/pass among the teams. Turnover percentage is also interesting here. 
+- I'd also create a new variable called division that shows each team's division (8 groups of 4) to see which division is scoring the most points and gaining the most yards.
 
 Stat 351 topics you plan to cover during the analysis:
 
-1. Topic 1
-2. Topic 2
-3. Topic 3
-4. Topic 4
-
+1. Web Scraping / API use - I've read that this site uses an API to make its data easily available. If not I can scrape it the hard way :( The data I want to use is the "Team Offense" table from 2024 to look at the many offensive statistics from last year. 
+2. I was thinking about adding a section about user agents even if I don't need one. I'd also talk about ethical web scraping, since the first three websites I tried to use all had terms and conditions saying web scraping was strictly prohibited. 
+3. Use of appropriate and well-chosen graphics will definitely be a part of the analysis. As they are so important to sharing information with non-statisticians, I will create graphics and explain how to use them properly.
+4. I am also really interested in creating interactive graphics. I think they would be especially useful for me entering a sports data position. 
+ - I suppose I very well could use list processing and functional programming as well but I can't tell you exactly what that would entail right now.
