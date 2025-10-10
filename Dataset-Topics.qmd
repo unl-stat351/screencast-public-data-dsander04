@@ -8,14 +8,14 @@ output: html
 
 Things you plan to investigate using this dataset:
 
-- I'd like to look at number of penalties vs. yards of those penalties. We would expect this to have a positive linear correlation, but if a team falls as an outlier we could do an analysis on that (they committed less harmful or more harmful penalties).
-- I also want to look at turnovers committed. It could either be looking at the difference between interceptions and fumbles between all teams or fumbles per rush vs. interceptions/pass among the teams. Turnover percentage is also interesting here. 
-- I'd also create a new variable called division that shows each team's division (8 groups of 4) to see which division is scoring the most points and gaining the most yards.
+- If possible, I want to compare the lengths of all versions of the bible. Are some dramatically longer than others? Are all the same books included in every version?
+- If I were to find a Qaran API, I would compare common words including names to see if there is a lot of crossover between the two.
+- If possible, making an interactive graph based on the number of bible versions in each language would be cool. Or if dates of first publishing are available, I could even do some sort of step plot that shows different versions by continent or something along those lines.
 
 Stat 351 topics you plan to cover during the analysis:
 
-1. Web Scraping / API use - I've read that this site uses an API to make its data easily available. If not I can scrape it the hard way :( The data I want to use is the "Team Offense" table from 2024 to look at the many offensive statistics from last year. 
+1. Web Scraping / API use - This site has an API. I'd sign up for one and use it to exract my data into list form. 
 2. I was thinking about adding a section about user agents even if I don't need one. I'd also talk about ethical web scraping, since the first three websites I tried to use all had terms and conditions saying web scraping was strictly prohibited. 
 3. Use of appropriate and well-chosen graphics will definitely be a part of the analysis. As they are so important to sharing information with non-statisticians, I will create graphics and explain how to use them properly.
 4. I am also really interested in creating interactive graphics. I think they would be especially useful for me entering a sports data position. 
- - I suppose I very well could use list processing and functional programming as well but I can't tell you exactly what that would entail right now.
+5. I very well could use list processing and functional programming as well given the data will almost certainly be in list form. I'd clean it up so everything looks nice and get it transformed into a data frame or tibble. 
