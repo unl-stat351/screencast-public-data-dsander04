@@ -4,3 +4,128 @@ title: Screencast Pseudocode
 output: html
 ---
 
+## Extract the data
+```{r}
+library(httr)
+library(httr2)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(purrr)
+library(jsonlite)
+library(usethis)
+
+#Explain what an API key is and why it's important / why certain sites use them#
+#Show how to get API key from website#
+#Briefly touch on the packages and why we use them#
+
+
+Sys.getenv("BIBLE_API_KEY")
+
+url <- "#biblelink#"
+key <- Sys.getenv("BIBLE_API_KEY")
+url <- paste0(url, "?api_key=", key, "#url info#")
+
+resp <- request(url) |>
+  req_perform()
+
+bible <- resp_body_json(resp)
+#str(holidays, max.level=3)
+
+bible_list<- fromJSON(resp_body_string(resp), flatten=TRUE)
+#oct_holidays <- holiday_list$response$holidays - cleaning/extracting if necessary
+
+bible_data <- tibble(
+    a = 
+    b = 
+    c = 
+)
+
+# function likely not necessary #
+#get_oct_holidays <- function(api_key, cache_file = "oct_holidays.Rdata"){
+ # if(file.exists(cache_file)){
+  #  load(cache_file)
+   # return(oct_holidays)
+  }
+}
+```
+
+## Clean the list data
+```{r}
+#If there are multiple data sets, I can combine them
+bible_full <- bind_rows(bible1, bible2, bible3) %>%
+    clean_names() #I don't think this function actually works unfortunately
+
+#If the list is double/triple nested, I can unnest them
+bible <- bible %>%
+    unnest_wider(column1, names_sep = "_")
+
+#Convert to different column type if needed#
+bible$release_date <- ymd_hms(bible$release_date)
+bible$copies_sold <- as.numeric(bible$copies_sold)
+
+#Change any null to NA (possibly not even necessary)
+null_to_na <- function(x) {
+  map(x, ~ if (is.null(.x)) NA else .x)
+}
+bible <- map(bible, null_to_na)
+
+```
+
+## Graph the Data
+```{r}
+#Graphing a total count per group in a histogram
+bible %>%
+    group_by(variable) %>%
+    summarise(n = count/sum) %>%
+ggplot(data=bible, aes(x=variable1), fill="color") + geom_histogram() + labs(title="", x="", y="")
+
+#Graphing the total count of something over time
+plot <- bible %>%
+    mutate(total = lag())
+ggplot(data=bible, aes(x=date)) + geom_line() + labs(. . .)
+```
+
+## Interactive Graphics
+```{r}
+#plotly allows us to create a basic interactive plot
+library(plotly)
+plotly(plot)
+
+#leaflet is good for graphing interactive map plots
+library(leaflet)
+m = leaflet() %>% addTiles()
+m  # a map with the default OSM tile layer
+
+m = m %>% setView(-93.65, 42.0285, zoom = 17)
+m
+
+m %>% addPopups(-93.65, 42.0285, 'Here is the <b>Department of Statistics</b>, ISU')
+
+#naturalearth package allows us to get a world map, can combine it with the data I have and graph it and sf gives
+#us special features
+library(naturalearth)
+library(sf)
+
+world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
+ ggplot(data = world_map_data) +
+      geom_sf() +
+      labs(title = "World Map Title") + 
+      theme_whateverworks()
+
+ joined <- left_join(world_map_data, bible_data, by ="country")
+ 
+library(viridis)
+map_plot <- ggplot(data=joined) +
+    geom_sf(aes(fill=variable), color) +
+    scale_fill_viridis(option="something") +
+    labs(title="") +
+    theme_something
+ggplotly(map_plot)
+
+#I can look into using rshiny which would be a good skill to know - maybe once we talk about it in class I'll feel 
+#more confident using it
+    
+```
+
