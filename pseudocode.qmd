@@ -4,7 +4,125 @@ title: Screencast Pseudocode
 output: html
 ---
 
-## Extract the data
+# Actual Pseudocode after API reset itself
+
+# Setting Up
+```{r}
+library(httr)
+library(httr2)
+library(tidyverse)
+library(purrr)
+library(jsonlite)
+library(usethis)
+library(rvest)
+library(readxl)
+library(plotly)
+library(viridis)
+
+url <- "https://openbible.com/download.htm"
+```
+
+# Extracting the Data
+```{r}
+page <- read_html(url)
+
+links <- page %>% html_elements(!)
+
+files <- links %>% html_attr(!)
+names <- links %>% html_text()
+
+df <- tibble(name = !, file = !)
+
+df_xlsx <- df %>% 
+    filter(str_detect(file, "\\.xlsx$"))
+
+
+
+xlsx_links <- c("links")
+
+#define links
+
+for (links in . . .) {
+  filename <- paste0("bible_links/", basename(links))
+  
+  GET(links, write_disk(filename, overwrite = TRUE))
+}
+```
+
+# Reading in and Cleaning the Data
+```{r}
+! <- read_xlsx("link") %>%
+    mutate(Version = "!") %>%
+    rename(Text = !) %>%
+            regex="^(.+) ([0-9]+):([0-9]+)$",
+            convert=TRUE)
+
+
+
+! <- ! %>%
+    mutate(verse_words = str_count(Text, boundary("word")))
+! <- ! %>%
+    group_by(Book) %>%
+    summarise(total_words = sum(!), .groups="drop")
+
+
+word_counter <- function(df, version_name){
+    df %>% function!!!
+        
+}
+
+rbind(!, !, !)
+```
+
+# Graphing/Interactive Plots
+```{r}
+cb_colors <- c(
+  "American King James" = "#E69F00",
+  "American Standard Version" = "#56B4E9",
+  "King James Version" = "#009E73"
+)
+
+plot <- ggplot()
+
+ggplotly(plot)
+```
+
+```{r}
+library(shiny)
+library(plotly)
+library(datasets)
+
+DF <- as.data.frame(state.x77)
+
+ui <- fluidPage(
+  selectizeInput("vars", "Select variables", choices=unique(DF$vars), multiple = TRUE, options = list('plugins' = list('remove_button'))),
+  selectizeInput("states", "Select states", choices=unique(DF$vars), multiple = TRUE, options = list('plugins' = list('remove_button'))),
+  plotlyOutput("Bar")
+)
+
+server <- function(input, output, session) {
+
+  filteredDF <- reactive({
+    req(input$states, input$vars)
+    cbind(stack(DF[input$states, ], select = input$vars), states = rownames(DF[input$states,]))
+  })
+
+  output$Bar <- renderPlotly({
+    req(filteredDF())
+    p <- plot_ly(filteredDF(), x=~ind, y= ~values, type = "bar", color = ~states)
+    p
+  })
+
+}
+
+shinyApp(ui, server)
+```
+
+
+
+
+
+# Original pseudocode submission
 ```{r}
 library(httr)
 library(httr2)
@@ -50,6 +168,7 @@ bible_data <- tibble(
   }
 }
 ```
+
 
 ## Clean the list data
 ```{r}
@@ -121,11 +240,12 @@ map_plot <- ggplot(data=joined) +
     geom_sf(aes(fill=variable), color) +
     scale_fill_viridis(option="something") +
     labs(title="") +
-    theme_something
+    theme_minimal
 ggplotly(map_plot)
-
-#I can look into using rshiny which would be a good skill to know - maybe once we talk about it in class I'll feel 
-#more confident using it
     
+```
+
+```{r}
+library()
 ```
 

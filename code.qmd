@@ -1,0 +1,150 @@
+---
+title: "code"
+format: html
+---
+
+# Setting Up
+```{r}
+library(httr)
+library(httr2)
+library(tidyverse)
+library(purrr)
+library(jsonlite)
+library(usethis)
+library(rvest)
+library(readxl)
+library(plotly)
+library(viridis)
+
+url <- "https://openbible.com/download.htm"
+```
+
+# Extracting the Data
+```{r}
+page <- read_html(url)
+
+links <- page %>% html_elements("a")
+
+files <- links %>% html_attr("href")
+names <- links %>% html_text()
+
+df <- tibble(name = names, file = files)
+
+df_xlsx <- df %>% 
+    filter(str_detect(file, "\\.xlsx$"))
+
+
+
+xlsx_links <- c("https://openbible.com/xls/asv.xlsx","https://openbible.com/xls/akjv.xlsx","https://openbible.com/xls/kjv.xlsx")
+
+#define links
+
+for (links in xlsx_links) {
+  filename <- paste0("bible_links/", basename(links))
+  
+  GET(links, write_disk(filename, overwrite = TRUE))
+}
+```
+
+# Reading in and Cleaning the Data
+```{r}
+akj <- read_xlsx("bible_links/akjv.xlsx")
+asv <- read_xlsx("bible_links/asv.xlsx")
+kjv <- read_xlsx("bible_links/kjv.xlsx")
+
+akj <- akj %>%
+    mutate(Version = "AKJ") %>%
+    rename(Text = AKJV) %>%
+            extract("...1", into = c("Book","Chapter","Verse"),
+            regex="^(.+) ([0-9]+):([0-9]+)$",
+            convert=TRUE) %>%
+            na.omit(akj)
+
+asv <- asv %>%
+    mutate(Version = "ASV") %>%
+    rename(Text = ASV) %>%
+            extract("...1", into = c("Book","Chapter","Verse"),
+            regex="^(.+) ([0-9]+):([0-9]+)$",
+            convert=TRUE) %>%
+            na.omit(asv)
+
+kjv <- kjv %>%
+    mutate(Version = "KJV") %>%
+    rename(Text = KJV) %>%
+            extract("...1", into = c("Book","Chapter","Verse"),
+            regex="^(.+) ([0-9]+):([0-9]+)$",
+            convert=TRUE) %>%
+            na.omit(kjv)
+
+
+akj <- akj %>%
+    mutate(verse_words = str_count(Text, boundary("word")))
+
+akj_book_words <- akj %>%
+    group_by(Book) %>%
+    summarise(total_words = sum(verse_words), .groups="drop")
+
+
+word_counter <- function(df, version_name){
+    df %>% 
+        mutate(verse_words = str_count(Text, boundary("word"))) %>%
+        group_by(Book) %>%
+        summarise(total_words = sum(verse_words), .groups="drop") %>%
+        mutate(Version = version_name)
+}
+
+akj_counted <- word_counter(akj, "American King James")
+asv_counted <- word_counter(asv, "American Standard Version")
+kjv_counted <- word_counter(kjv, "King James Version")
+
+all_counted <- rbind(akj_counted, asv_counted, kjv_counted)
+```
+
+# Graphing/Interactive Plots
+```{r}
+cb_colors <- c(
+  "American King James" = "#E69F00",
+  "American Standard Version" = "#56B4E9",
+  "King James Version" = "#009E73"
+)
+
+plot <- ggplot(all_counted, 
+               aes(x=Book, y=total_words, fill=Version, group=Version)) +
+                geom_col(position = "dodge") +
+                theme_minimal() +
+                scale_fill_manual(values=cb_colors) +
+                theme(axis.text.x = element_text(angle=90, vjust=-.01))
+plot
+
+ggplotly(plot)
+```
+
+```{r}
+library(shiny)
+library(plotly)
+library(datasets)
+
+ui <- fluidPage(
+  selectizeInput("Versions", "Select Versions", choices=unique(all_counted$Version), multiple = TRUE, options = list('plugins' = list('remove_button'))),
+  selectizeInput("Books", "Select Books", choices=unique(all_counted$Book), multiple = TRUE, options = list('plugins' = list('remove_button'))),
+  plotlyOutput("Bar")
+)
+
+server <- function(input, output, session) {
+
+  filteredDF <- reactive({
+    req(input$Versions, input$Books)
+   all_counted %>%
+       filter(Version %in% input$Versions, Book %in% input$Books)
+  })
+
+  output$Bar <- renderPlotly({
+    req(filteredDF())
+    plot_ly(filteredDF(), x=~Book, y= ~total_words, type = "bar", color = ~Version, text=~paste("Words:"), total_words, hoverinfo="text") %>%
+        layout(barmode="group", xaxis=list(tickangle=-90))
+  })
+
+}
+
+shinyApp(ui, server)
+```
